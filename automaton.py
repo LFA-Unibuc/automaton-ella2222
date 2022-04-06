@@ -8,6 +8,7 @@ class Automaton():
         self.sigma = []
         self.states = []
         self.transitions = []
+        self.dictionar = {}
         print("Hi, I'm an automaton!")
 
     def alfabet(linie, sus, jos):
@@ -78,7 +79,6 @@ class Automaton():
         i = 0
         while i < len(linii):
             if linii[i].startswith('#') or linii[i].startswith('\n'):
-                i += 1
                 continue
             else:
                 sectiune = linii[i].split()[0]
@@ -97,6 +97,14 @@ class Automaton():
                     else:
                         if sectiune == 'Transitions':
                             self.transitions = Automaton.tranzitii(linii, i + 1, j)
+                            tranz = {}
+                            for tranzitie in self.transitions:
+                                if tranzitie[0] not in tranz:
+                                    tranz[tranzitie[0]] = {}
+                                    tranz[tranzitie[0]][tranzitie[1]] = tranzitie[2]
+                                else:
+                                    tranz[tranzitie[0]][tranzitie[1]] = tranzitie[2]
+                            self.dictionar = tranz
                             if self.transitions == False:
                                 raise rejectionException()
                         else:
