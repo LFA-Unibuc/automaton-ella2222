@@ -78,6 +78,7 @@ class Automaton():
         i = 0
         while i < len(linii):
             if linii[i].startswith('#') or linii[i].startswith('\n'):
+                i += 1
                 continue
             else:
                 sectiune = linii[i].split()[0]
