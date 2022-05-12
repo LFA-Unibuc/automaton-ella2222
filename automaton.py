@@ -7,6 +7,7 @@ class Automaton():
         self.config_file = config_file
         self.sigma = []
         self.states = []
+        self.final = []
         self.transitions = []
         self.dictionar = {}
         print("Hi, I'm an automaton!")
@@ -23,14 +24,18 @@ class Automaton():
     def stari(linie, sus, jos):
         l = []
         nrs = 0
+        final = []
         for i in range(sus, jos):
             cuv = [x.strip() for x in linie[i].split(',')]
             l.append(cuv[0])
             if 'S' in cuv:
                 nrs += 1
-            if nrs != 1:
-                return False
-        return l
+                start = cuv[0]
+            if 'F' in cuv:
+                final.append(cuv[0])
+        if nrs != 1:
+            return False
+        return l, start, final
 
     def tranzitii(linie, sus, jos):
         l = []
@@ -79,6 +84,7 @@ class Automaton():
         i = 0
         while i < len(linii):
             if linii[i].startswith('#') or linii[i].startswith('\n'):
+                i += 1
                 continue
             else:
                 sectiune = linii[i].split()[0]
@@ -91,7 +97,9 @@ class Automaton():
                         raise rejectionException()
                 else:
                     if sectiune == 'States':
-                        self.states = Automaton.stari(linii, i + 1, j)
+                        self.states = Automaton.stari(linii, i + 1, j)[0]
+                        self.start = Automaton.stari(linii, i + 1, j)[1]
+                        self.final = Automaton.stari(linii, i + 1, j)[2]
                         if self.states == False:
                             raise rejectionException()
                     else:
@@ -103,7 +111,19 @@ class Automaton():
                                     tranz[tranzitie[0]] = {}
                                     tranz[tranzitie[0]][tranzitie[1]] = tranzitie[2]
                                 else:
-                                    tranz[tranzitie[0]][tranzitie[1]] = tranzitie[2]
+                                    if tranzitie[1] in tranz[tranzitie[0]]:
+                                        tranz[tranzitie[0]][tranzitie[1]].append(tranzitie[2])
+                                    else:
+                                        tranz[tranzitie[0]][tranzitie[1]] = [tranzitie[2]]
+                            for stare in self.states:
+                                if stare not in tranz:
+                                    tranz[stare] = {}
+                                    for cuvant in self.sigma:
+                                        tranz[stare][cuvant] = []
+                            for elem in tranz:
+                                for cuvant in self.sigma:
+                                    if cuvant not in tranz[elem]:
+                                        tranz[elem][cuvant] = []
                             self.dictionar = tranz
                             if self.transitions == False:
                                 raise rejectionException()
@@ -116,3 +136,5 @@ class Automaton():
 if __name__ == "__main__":
     a = Automaton('date.txt')
     print(a.validate())
+
+
